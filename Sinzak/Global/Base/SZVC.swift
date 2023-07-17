@@ -5,6 +5,7 @@
 //  Created by Doy Kim on 2022/12/13.
 //
 
+import SwiftUI
 import UIKit
 import RxSwift
 import RxCocoa
@@ -80,10 +81,10 @@ class SZVC: UIViewController {
         NotificationCenter.default.rx.notification(.goLogin)
             .asSignal(onErrorRecover: { _ in .never() })
             .emit(with: self, onNext: { owner, _ in
-                let vm = DefaultLoginVM()
-                let vc = LoginVC(viewModel: vm)
+                let loginVM = LoginViewModel()
+                let loginVC = UIHostingController(rootView: LoginView(viewModel: loginVM))
                 
-                let nav = UINavigationController(rootViewController: vc)
+                let nav = UINavigationController(rootViewController: loginVC)
                 nav.modalPresentationStyle = .fullScreen
                 
                 owner.present(nav, animated: true)
@@ -137,11 +138,10 @@ extension UIViewController {
             message: "로그인 후 이용가능합니다.",
             rightActionTitle: "로그인하기",
             rightActionCompletion: { [weak self] in
-                let vm = DefaultLoginVM()
-                let vc = LoginVC(viewModel: vm)
-                vc.configureDismissButton()
+                let loginVM = LoginViewModel()
+                let loginVC = UIHostingController(rootView: LoginView(viewModel: loginVM))
                 
-                let nav = UINavigationController(rootViewController: vc)
+                let nav = UINavigationController(rootViewController: loginVC)
                 nav.modalPresentationStyle = .fullScreen
                 
                 self?.present(nav, animated: true)

@@ -10,7 +10,7 @@ import Moya
 import RxSwift
 import SwiftKeychainWrapper
 
-class SNSLoginManager {
+final class SNSLoginManager {
     private init () {}
     static let shared = SNSLoginManager()
     let provider = MoyaProvider<SNSLoginAPI>(
@@ -18,26 +18,10 @@ class SNSLoginManager {
         plugins: [MoyaLoggerPlugin.shared]
     )
     let disposeBag = DisposeBag()
-    
-    /// 애플로그인
-    func doAppleLogin(idToken: String, origin: String = "apple", completion: @escaping ((Result<SNSLoginResult, Error>) -> Void) ) {
-        provider.request(.apple(idToken: idToken)) { (result) in
-            // escaping completion handler로 처리하기
-            switch result {
-            case let .success(data):
-                do {
-                    let decoder = JSONDecoder()
-                    let result = try decoder.decode(SNSLoginResult.self, from: data.data)
-                    completion(.success(result))
-                } catch {
-                    completion(.failure(error))
-                }
-            case let .failure(error):
-                completion(.failure(error))
-            }
-        }
-    }
-    
+}
+
+// MARK: - Apple Login
+extension SNSLoginManager {
     func doAppleLogin(idToken: String) -> Single<SNSLoginGrant> {
         return provider.rx.request(.apple(idToken: idToken))
             .map { response in
@@ -90,7 +74,10 @@ class SNSLoginManager {
                 })
             .disposed(by: disposeBag)
     }
-    
+}
+
+// MARK: - Kakao Login
+extension SNSLoginManager {
     /// kakao 로그인
     func doKakaoLogin(accessToken: String) async throws -> SNSLoginGrant {
         var response: Response
@@ -121,26 +108,10 @@ class SNSLoginManager {
             throw APIError.decodingError
         }
     }
-    
-    /// naver 로그인
-    func doNaverLogin(accessToken: String, origin: String = "naver", completion: @escaping ((Result<SNSLoginResult, Error>) -> Void) ) {
-        provider.request(.naver(accessToken: accessToken)) { (result) in
-            // escaping completion handler로 처리하기
-            switch result {
-            case let .success(data):
-                do {
-                    let decoder = JSONDecoder()
-                    let result = try decoder.decode(SNSLoginResult.self, from: data.data)
-                    completion(.success(result))
-                } catch {
-                    completion(.failure(error))
-                }
-            case let .failure(error):
-                completion(.failure(error))
-            }
-        }
-    }
-    
+}
+
+// MARK: - Naver Login
+extension SNSLoginManager {
     /// naver 로그인
     func doNaverLogin(accessToken: String) -> Single<SNSLoginGrant> {
         return provider.rx.request(.naver(accessToken: accessToken))

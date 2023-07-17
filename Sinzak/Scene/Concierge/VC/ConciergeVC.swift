@@ -5,6 +5,7 @@
 //  Created by Doy Kim on 2022/12/13.
 //
 
+import SwiftUI
 import UIKit
 import RxSwift
 import RxRelay
@@ -63,8 +64,9 @@ final class ConciergeVC: UIViewController {
                                 onFailure: { error in
                                     Log.error(error)
                                     UserCommandManager.shared.saveFCM(userID: UserInfoManager.userID ?? -1, token: "")
-                                    let root = LoginVC(viewModel: DefaultLoginVM())
-                                    let vc = UINavigationController(rootViewController: root)
+                                    let loginVM = LoginViewModel()
+                                    let loginVC = UIHostingController(rootView: LoginView(viewModel: loginVM))
+                                    let vc = UINavigationController(rootViewController: loginVC)
 //                                    let vc = TabBarVC()
                                     owner.nextVC.accept(vc)
                                 })
@@ -72,8 +74,9 @@ final class ConciergeVC: UIViewController {
                     },
                     onFailure: { owner, error in
                         UserCommandManager.shared.saveFCM(userID: UserInfoManager.userID ?? -1, token: "")
-                        let root = LoginVC(viewModel: DefaultLoginVM())
-                        let vc = UINavigationController(rootViewController: root)
+                        let loginVM = LoginViewModel()
+                        let loginVC = UIHostingController(rootView: LoginView(viewModel: loginVM))
+                        let vc = UINavigationController(rootViewController: loginVC)
 //                        let vc = TabBarVC()
                         owner.nextVC.accept(vc)
                         Log.error(error)

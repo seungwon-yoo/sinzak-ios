@@ -5,6 +5,7 @@
 //  Created by Doy Kim on 2023/01/10.
 //
 
+import SwiftUI
 import UIKit
 import RxSwift
 import RxCocoa
@@ -89,15 +90,14 @@ extension TabBarVC: UITabBarControllerDelegate {
         guard !UserInfoManager.isLoggedIn, let nav = viewController as? UINavigationController else { return true }
         
         if nav.viewControllers[0] is ChatListVC || nav.viewControllers[0] is MyProfileVC {
-            let loginVC: LoginVC = {
-                let vc = LoginVC(viewModel: DefaultLoginVM())
-                vc.configureNeedLoginLayout()
-                
-                return vc
-            }()
+            let loginViewModel = LoginViewModel()
+            let loginVC = UIHostingController(rootView: LoginView(viewModel: loginViewModel))
             
             let nav = UINavigationController(rootViewController: loginVC)
             nav.modalPresentationStyle = .fullScreen
+            loginVC.rootView.dismissHandler = {
+                nav.dismiss(animated: true)
+            }
             present(nav, animated: true)
             return false
         }

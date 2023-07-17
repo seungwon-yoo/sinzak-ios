@@ -2,104 +2,71 @@
 //  LoginView.swift
 //  Sinzak
 //
-//  Created by Doy Kim on 2022/12/26.
+//  Created by 유승원 on 2023/06/28.
+//  Copyright © 2023 Apple. All rights reserved.
 //
 
-import UIKit
+import Combine
+import SwiftUI
+import AuthenticationServices
 
-import Then
-import SnapKit
+struct LoginView<T: LoginViewModelType>: View {
+    // TODO: 로그인 성공했을 때 binding을 이용해서 화면 전환할 것.
+    @ObservedObject var viewModel: T
+    var dismissHandler: (() -> Void)?
+    
+    var body: some View {
+        NavigationView {
+            VStack(alignment: .center) {
+                Text("로그인 후에 만나볼 수 있어요")
+                    .frame(width: 207, height: 90)
+                    .foregroundColor(CustomColor.SwiftUI.label)
+                    .font(.title_B)
+                    .minimumScaleFactor(0.5)
+                    .multilineTextAlignment(.center)
+                VStack(spacing: 10) {
+                    Text("SNS 계정으로 간편하게 시작하기")
+                        .foregroundColor(CustomColor.SwiftUI.gray80)
+                        .font(.caption_R)
+                    HStack(spacing: 16) {
+                        Button {
+                            self.viewModel.kakaoButtonTapped()
+                        } label: {
+                            Image("kakao_logo")
+                        }
+                        .frame(width: 59, height: 59)
+                        Button {
+                            self.viewModel.naverButtonTapped()
+                        } label: {
+                            Image("naver_logo")
+                        }
+                        .frame(width: 59, height: 59)
+                        Button {
+                            self.viewModel.appleButtonTapped()
+                        } label: {
+                            Image("apple_logo")
+                        }
+                        .frame(width: 59, height: 59)
+                    }
+                }
+                .padding(.top, 185)
+            }
+            .padding(.top, 100)
+        }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    self.dismissHandler?()
+                } label: {
+                    Image("dismiss")
+                }
+            }
+        }
+    }
+}
 
-final class LoginView: SZView {
-    // MARK: - Properties
-    private let logotypeImage = UIImageView().then {
-        $0.contentMode = .scaleAspectFit
-        $0.image = UIImage(named: "logotype")
-    }
-    private let logoLabel = UILabel().then {
-        $0.font = .subtitle_B
-        $0.textColor = CustomColor.label
-        $0.text = "신세대의 작품을 만나다"
-    }
-    
-    private let needLoginLabel: UILabel = {
-        let label = UILabel()
-        label.text = "로그인 후에\n만나볼 수 있어요"
-        label.textColor = CustomColor.label
-        label.font = .title_B
-        label.isHidden = true
-        label.numberOfLines = 2
-        label.textAlignment = .center
-        
-        return label
-    }()
-    
-    private let startLabel = UILabel().then {
-        $0.font = .caption_R
-        $0.textColor = CustomColor.gray80
-        $0.text = "SNS계정으로 간편하게 시작하기"
-    }
-    private let stackView = UIStackView().then {
-        $0.spacing = 16
-    }
-    let kakaoButton = UIButton().then {
-        $0.setImage(UIImage(named: "kakao_logo"), for: .normal)
-    }
-    let naverButton = UIButton().then {
-        $0.setImage(UIImage(named: "naver_logo"), for: .normal)
-    }
-    let appleButton = UIButton().then {
-        $0.setImage(UIImage(named: "apple_logo"), for: .normal)
-    }
-    
-    func configureNeedLoginLayout() {
-        logotypeImage.isHidden = true
-        logoLabel.isHidden = true
-        needLoginLabel.isHidden = false
-    }
-    
-    // MARK: - Design Helpers
-    override func setView() {
-        addSubviews(logotypeImage, logoLabel, startLabel, stackView, needLoginLabel)
-        stackView.addArrangedSubviews(kakaoButton, naverButton, appleButton)
-    }
-    override func setLayout() {
-        logotypeImage.snp.makeConstraints { make in
-            make.leading.equalToSuperview().inset(35)
-            make.top.equalTo(safeAreaLayoutGuide).inset(70)
-            make.width.equalTo(160)
-            make.height.equalTo(53)
-        }
-        logoLabel.snp.makeConstraints { make in
-            make.leading.equalToSuperview().inset(44)
-            make.top.equalTo(logotypeImage.snp.bottom).offset(4)
-        }
-        stackView.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.bottom.equalToSuperview().inset(146)
-            make.height.equalTo(56)
-        }
-        kakaoButton.snp.makeConstraints { make in
-            make.height.equalToSuperview()
-            make.width.equalTo(kakaoButton.snp.height)
-        }
-        naverButton.snp.makeConstraints { make in
-            make.height.equalToSuperview()
-            make.width.equalTo(naverButton.snp.height)
-        }
-        appleButton.snp.makeConstraints { make in
-            make.height.equalToSuperview()
-            make.width.equalTo(appleButton.snp.height)
-        }
-        
-        needLoginLabel.snp.makeConstraints {
-            $0.bottom.equalTo(startLabel.snp.top).offset(-188.0)
-            $0.centerX.equalToSuperview()
-        }
-        
-        startLabel.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.bottom.equalTo(stackView.snp.top).offset(-17.8)
-        }
+struct LoginView_Previews: PreviewProvider {
+    static var previews: some View {
+        LoginView(viewModel: LoginViewModel())
     }
 }
